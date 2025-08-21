@@ -1,3 +1,4 @@
+
 /* === Base === */
 body {
   font-family: "Poppins", sans-serif;
@@ -7,6 +8,8 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
 }
 
 /* === Player Container === */
@@ -17,15 +20,17 @@ body {
   border-radius: 20px;
   box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.4);
   width: 320px;
-  max-width: 90%;
+  max-width: 100%;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 /* === Title === */
 .title {
   font-size: 25px;
   font-weight: 600;
-  margin-bottom: 35px;
+  margin-bottom: 25px;
 }
 
 /* === Controls === */
@@ -34,6 +39,7 @@ body {
   justify-content: center;
   align-items: center;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .controls button {
@@ -116,7 +122,7 @@ body {
   color: #f0f0f0;
   text-align: center;
   font-style: italic;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
 }
 
 /* === Playlist === */
@@ -128,6 +134,8 @@ body {
   text-align: left;
   border-top: 3px solid #383838;
   border-bottom: 3px solid #383838;
+  max-height: 200px;      /* biar tidak kepanjangan */
+  overflow-y: auto;       /* scroll kalau terlalu panjang */
 }
 
 #playlist li {
@@ -146,4 +154,41 @@ body {
   background: #383838;
   color: #fff;
   font-weight: 500;
+}
+
+/* === Responsive Mobile === */
+@media (max-width: 480px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    padding: 15px;
+  }
+
+  .player {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .controls {
+    gap: 5px;
+  }
+
+  .controls button {
+    padding: 10px;
+    font-size: 18px;
+  }
+
+  #current-track {
+    font-size: 12px;
+  }
+
+  #playlist {
+    font-size: 13px;
+    max-height: 150px;
+  }
 }

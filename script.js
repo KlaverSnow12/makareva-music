@@ -15,6 +15,25 @@ let trackIndex = 0;
 let repeatMode = "none"; // none | all | one
 let isSeeking = false;
 
+// ===== Visualizer Setup =====
+const canvas = document.getElementById("visualizer");
+const ctx = canvas.getContext("2d");
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+window.addEventListener("resize", resizeCanvas);
+resizeCanvas();
+
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+let audioSource;
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = 256;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+let visualizerStarted = false;
+
 // ===== Load Track =====
 function loadTrack(index) {
   for (let i = 0; i < playlist.length; i++) {
@@ -36,6 +55,13 @@ function loadTrack(index) {
 
 // ===== Controls =====
 function togglePlayPause() {
+  if (audioCtx.state === "suspended") audioCtx.resume(); // Mobile fix
+  if (!audioSource) { // Buat MediaElementSource hanya sekali
+    audioSource = audioCtx.createMediaElementSource(audio);
+    audioSource.connect(analyser);
+    analyser.connect(audioCtx.destination);
+  }
+  if (!visualizerStarted) drawVisualizer();
   if (audio.paused) audio.play();
   else audio.pause();
 }
@@ -87,7 +113,7 @@ for (let i = 0; i < playlist.length; i++) {
   playlist[i].addEventListener("click", () => {
     trackIndex = i;
     loadTrack(trackIndex);
-    audio.play();
+    togglePlayPause();
   });
 }
 
@@ -117,7 +143,6 @@ audio.addEventListener("timeupdate", () => {
     currentTimeEl.textContent = formatTime(audio.currentTime);
   }
 });
-
 audio.addEventListener("loadedmetadata", () => {
   durationEl.textContent = formatTime(audio.duration);
 });
@@ -174,30 +199,10 @@ audio.addEventListener("error", () => {
 // Load pertama
 loadTrack(trackIndex);
 
-// ===== Visualizer Setup =====
-const canvas = document.getElementById("visualizer");
-const ctx = canvas.getContext("2d");
-
-function resizeCanvas() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
-window.addEventListener("resize", resizeCanvas);
-resizeCanvas();
-
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-const audioSource = audioCtx.createMediaElementSource(audio);
-const analyser = audioCtx.createAnalyser();
-audioSource.connect(analyser);
-analyser.connect(audioCtx.destination);
-analyser.fftSize = 256;
-
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
-
-// ===== Hybrid Visualizer =====
-function drawHybridVisualizer() {
-  requestAnimationFrame(drawHybridVisualizer);
+// ===== Visualizer =====
+function drawVisualizer() {
+  visualizerStarted = true;
+  requestAnimationFrame(drawVisualizer);
   analyser.getByteFrequencyData(dataArray);
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -211,7 +216,7 @@ function drawHybridVisualizer() {
   for (let i = 0; i < bufferLength; i++) {
     const barHeight = dataArray[i];
 
-    // --- Linear Neon Bar ---
+    // Linear bar
     const gradient = ctx.createLinearGradient(0, canvas.height - barHeight, 0, canvas.height);
     gradient.addColorStop(0, "red");
     gradient.addColorStop(0.5, "yellow");
@@ -222,7 +227,7 @@ function drawHybridVisualizer() {
     ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
     x += barWidth + 1;
 
-    // --- Circular Radial ---
+    // Circular radial
     const angle = (i / bufferLength) * 2 * Math.PI;
     const x1 = cx + Math.cos(angle) * radius;
     const y1 = cy + Math.sin(angle) * radius;
@@ -238,9 +243,3 @@ function drawHybridVisualizer() {
     ctx.stroke();
   }
 }
-
-// Start visualizer saat audio play
-audio.addEventListener("play", () => {
-  if (audioCtx.state === "suspended") audioCtx.resume();
-  drawHybridVisualizer();
-});

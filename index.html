@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Makareva Music</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" />
+</head>
+
+<body>
+  <div class="player">
+    <h2 class="title">MAKAREVA MUSIC</h2>
+    <audio id="audio"></audio>
+
+    <!-- Kontrol -->
+    <div class="controls">
+      <button id="prev">
+        <span class="material-symbols-outlined">skip_previous</span>
+      </button>
+      <button id="play">
+        <span class="material-symbols-outlined">play_arrow</span>
+      </button>
+      <button id="stop">
+        <span class="material-symbols-outlined">stop</span>
+      </button>
+      <button id="next">
+        <span class="material-symbols-outlined">skip_next</span>
+      </button>
+    </div>
+
+    <!-- Progress bar -->
+    <div class="progress-container">
+      <span id="current-time">0:00</span>
+      <input type="range" id="progress" value="0" min="0" max="100">
+      <span id="duration">0:00</span>
+      <button id="repeat">
+        <span class="material-symbols-outlined">repeat</span>
+      </button>
+    </div>
+
+    <!-- Track aktif -->
+    <div class="current-track">
+      <p id="current-track">Tidak ada lagu</p>
+    </div>
+
+    <!-- Playlist -->
+    <h3>Playlist</h3>
+    <ul id="playlist">
+      <li data-src="Music/Makareva - Berawal Dari Pagi.mp3">Berawal Dari Pagi</li>
+      <li data-src="Music/Makareva - Teralihkan Senyuman.mp3">Teralihkan Senyuman</li>
+      <li data-src="Music/Makareva - Mengukir Kisah.mp3">Mengukir Kisah</li>
+      <li data-src="Music/Makareva - Hanya Sebatas Teman.mp3">Hanya Sebatas Teman</li>
+      <li data-src="Music/Makareva - Its Over.mp3">Its Over</li>
+      <li data-src="Music/Makareva - Dermaga.mp3">Dermaga</li>
+    </ul>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>

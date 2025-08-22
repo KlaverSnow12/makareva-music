@@ -22,14 +22,14 @@ body {
   border-radius: 20px;
   box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.5);
   width: 320px;
-  max-width: 100%;
+  max-width: 95%;
   text-align: center;
   display: flex;
   flex-direction: column;
   backdrop-filter: blur(10px);
   transition: all 0.3s ease;
   position: relative;
-  z-index: 1;  
+  z-index: 1;
 }
 
 /* === Title === */
@@ -98,7 +98,7 @@ body {
 #progress {
   flex: 1;
   cursor: pointer;
-  accent-color: #dcdcdc; /* warna bar */
+  accent-color: #dcdcdc;
   transition: all 0.3s ease;
 }
 
@@ -110,7 +110,7 @@ body {
 #duration {
   font-size: 12px;
   color: #dcdcdc;
-  width: 30px;
+  width: 35px;
   text-align: center;
 }
 
@@ -152,8 +152,9 @@ body {
   text-align: left;
   border-top: 3px solid rgba(255,255,255,0.2);
   border-bottom: 3px solid rgba(255,255,255,0.2);
-  max-height: 200px;
-  overflow-y: auto;
+  max-height: 25vh;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch; /* smooth di mobile */
   background: rgba(0,0,0,0.3);
   border-radius: 10px;
   transition: all 0.3s ease;
@@ -216,7 +217,7 @@ body {
 
   #playlist {
     font-size: 13px;
-    max-height: 150px;
+    max-height: 30vh;
   }
 }
 
@@ -237,7 +238,7 @@ body {
   }
 
   #playlist {
-    max-height: 120px;
+    max-height: 25vh;
     overflow-y: auto;
   }
 
@@ -251,13 +252,269 @@ body {
   }
 }
 
+/* === Visualizer === */
+/* === Base === */
+body {
+  font-family: "Poppins", sans-serif;
+  background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.pexels.com/photos/1629236/pexels-photo-1629236.jpeg?_gl=1*uuenh2*_ga*MTMzMDk1NjU2Ni4xNzU1ODE3NDcy*_ga_8JE65Q40S6*czE3NTU4MTc0NzEkbzEkZzEkdDE3NTU4MTc1NTIkajU5JGwwJGgw');
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  padding: 10px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+/* === Player Container === */
+.player {
+  color: #f5f5f5;
+  background: rgba(90, 90, 90, 0.7);
+  padding: 20px;
+  border-radius: 20px;
+  box-shadow: 0px 4px 25px rgba(0, 0, 0, 0.5);
+  width: 320px;
+  max-width: 95%;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+/* === Title === */
+.title {
+  font-size: 25px;
+  font-weight: 600;
+  margin-bottom: 25px;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  transition: all 0.3s ease;
+}
+
+/* === Controls === */
+.controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.controls button {
+  background: rgba(235, 235, 235, 0.8);
+  color: #000;
+  border: none;
+  padding: 12px;
+  border-radius: 50%;
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.controls button:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+  color: #000;
+  transform: scale(1.1) rotate(-5deg);
+}
+
+.controls button:active {
+  transform: scale(0.95);
+  box-shadow: 0 0 10px rgba(255,255,255,0.3);
+}
+
+/* === Material Icons === */
+.controls .material-symbols-outlined {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 28;
+  transition: all 0.3s ease;
+}
+
+/* === Progress Bar + Repeat === */
+.progress-container {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 20px 5px;
+  transition: all 0.3s ease;
+}
+
+#progress {
+  flex: 1;
+  cursor: pointer;
+  accent-color: #dcdcdc;
+  transition: all 0.3s ease;
+}
+
+#progress:hover {
+  accent-color: #649cf6;
+}
+
+#current-time,
+#duration {
+  font-size: 12px;
+  color: #dcdcdc;
+  width: 35px;
+  text-align: center;
+}
+
+/* Tombol repeat */
+#repeat {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+#repeat .material-symbols-outlined {
+  font-size: 18px;
+  color: #ebebeb;
+  transition: all 0.3s ease;
+}
+
+#repeat.active .material-symbols-outlined {
+  color: #649cf6;
+}
+
+/* === Current Track Info === */
+#current-track {
+  font-size: 13px;
+  font-weight: bold;
+  color: #f0f0f0;
+  text-align: center;
+  font-style: italic;
+  margin-bottom: 15px;
+  transition: all 0.5s ease;
+}
+
+/* === Playlist === */
+#playlist {
+  font-size: 14px;
+  list-style: none;
+  padding: 10px;
+  margin-top: 15px;
+  text-align: left;
+  border-top: 3px solid rgba(255,255,255,0.2);
+  border-bottom: 3px solid rgba(255,255,255,0.2);
+  max-height: 25vh;
+  overflow-y: scroll;
+  -webkit-overflow-scrolling: touch; /* smooth di mobile */
+  background: rgba(0,0,0,0.3);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+#playlist li {
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+#playlist li:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: translateX(5px) scale(1.02);
+}
+
+#playlist li.active {
+  background: #383838;
+  color: #fff;
+  font-weight: 500;
+}
+
+/* === Animasi fade untuk track yang berubah === */
+.fade {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* === Responsive Mobile === */
+@media (max-width: 480px) {
+  body {
+    height: auto;
+    min-height: 100vh;
+    padding: 15px;
+  }
+
+  .player {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+
+  .controls {
+    gap: 5px;
+  }
+
+  .controls button {
+    padding: 10px;
+    font-size: 18px;
+  }
+
+  #current-track {
+    font-size: 12px;
+  }
+
+  #playlist {
+    font-size: 13px;
+    max-height: 30vh;
+  }
+}
+
+/* === Responsive Landscape === */
+@media (orientation: landscape) and (max-width: 900px) {
+  body {
+    flex-direction: row;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 10px;
+    height: auto;
+  }
+
+  .player {
+    flex: 1;
+    max-width: 500px;
+    margin: 0 10px;
+  }
+
+  #playlist {
+    max-height: 25vh;
+    overflow-y: auto;
+  }
+
+  .controls {
+    gap: 8px;
+  }
+
+  .controls button {
+    padding: 10px;
+    font-size: 18px;
+  }
+}
+
+/* === Visualizer === */
 #visualizer {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  height: 100%;
-  z-index: 0; /* di belakang player */
-  pointer-events: none; /* agar klik tetap ke player */
+  height: 100%;   /* full screen */
+  z-index: 0;
+  pointer-events: none;
   background: transparent;
 }

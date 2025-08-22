@@ -155,32 +155,24 @@ audio.addEventListener("loadedmetadata", () => {
 
 // ===== Progress drag/click (desktop + mobile) =====
 function startSeek() { isSeeking = true; }
-
 function endSeek(e) {
-  isSeeking = false;
   if (!audio.duration) return;
-
+  isSeeking = false;
   const rect = progress.getBoundingClientRect();
-  let clientX;
-  if (e.type.startsWith("touch")) clientX = e.changedTouches[0].clientX;
-  else clientX = e.clientX;
-
-  const value = ((clientX - rect.left) / rect.width) * 100;
-  audio.currentTime = (value / 100) * audio.duration;
+  const clientX = e.type.startsWith("touch") ? e.changedTouches[0].clientX : e.clientX;
+  let value = ((clientX - rect.left) / rect.width) * 100;
+  value = Math.min(Math.max(value, 0), 100);
   progress.value = value;
+  audio.currentTime = (value / 100) * audio.duration;
 }
-
 function seeking(e) {
   if (!isSeeking || !audio.duration) return;
-
   const rect = progress.getBoundingClientRect();
-  let clientX;
-  if (e.type.startsWith("touch")) clientX = e.touches[0].clientX;
-  else clientX = e.clientX;
-
-  const value = ((clientX - rect.left) / rect.width) * 100;
-  currentTimeEl.textContent = formatTime((value / 100) * audio.duration);
+  const clientX = e.type.startsWith("touch") ? e.touches[0].clientX : e.clientX;
+  let value = ((clientX - rect.left) / rect.width) * 100;
+  value = Math.min(Math.max(value, 0), 100);
   progress.value = value;
+  currentTimeEl.textContent = formatTime((value / 100) * audio.duration);
 }
 
 // Mouse events
@@ -193,6 +185,11 @@ progress.addEventListener("click", endSeek);
 progress.addEventListener("touchstart", startSeek);
 progress.addEventListener("touchmove", seeking);
 progress.addEventListener("touchend", endSeek);
+progress.addEventListener("input", () => {
+  if (!audio.duration) return;
+  audio.currentTime = (progress.value / 100) * audio.duration;
+  currentTimeEl.textContent = formatTime(audio.currentTime);
+});
 
 // ===== Button controls =====
 playPauseBtn.addEventListener("click", togglePlayPause);
@@ -231,7 +228,6 @@ loadTrack(trackIndex);
 function drawVisualizer() {
   visualizerRunning = true;
   requestAnimationFrame(drawVisualizer);
-
   analyser.getByteFrequencyData(dataArray);
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
 
@@ -244,7 +240,7 @@ function drawVisualizer() {
   for (let i = 0; i < bufferLength; i++) {
     const barHeight = dataArray[i] / 1.5;
 
-    // ===== Linear Bar =====
+    // Linear Bar
     const gradient = ctx.createLinearGradient(0, canvasHeight - barHeight, 0, canvasHeight);
     gradient.addColorStop(0, "red");
     gradient.addColorStop(0.5, "yellow");
@@ -255,7 +251,7 @@ function drawVisualizer() {
     ctx.fillRect(x, canvasHeight - barHeight, barWidth, barHeight);
     x += barWidth + 1;
 
-    // ===== Circular Radial =====
+    // Circular Radial
     const angle = (i / bufferLength) * 2 * Math.PI;
     const x1 = cx + Math.cos(angle) * radius;
     const y1 = cy + Math.sin(angle) * radius;

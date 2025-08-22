@@ -21,6 +21,7 @@ let isSeeking = false;
 const canvas = document.getElementById("visualizer");
 const ctx = canvas.getContext("2d");
 let canvasWidth, canvasHeight;
+
 function resizeCanvas() {
   canvasWidth = window.innerWidth;
   canvasHeight = window.innerHeight * 0.3; // 30% tinggi layar
@@ -73,11 +74,13 @@ function togglePlayPause() {
   if (audio.paused) audio.play();
   else audio.pause();
 }
+
 function stopTrack() {
   audio.pause();
   audio.currentTime = 0;
   progress.value = 0;
 }
+
 function nextTrack() {
   if(trackIndex < playlist.length - 1) trackIndex++;
   else if(repeatMode === "all") trackIndex = 0;
@@ -85,6 +88,7 @@ function nextTrack() {
   loadTrack(trackIndex);
   audio.play();
 }
+
 function prevTrack() {
   if(trackIndex > 0) trackIndex--;
   else if(repeatMode === "all") trackIndex = playlist.length - 1;
@@ -149,21 +153,46 @@ audio.addEventListener("loadedmetadata", () => {
   durationEl.textContent = formatTime(audio.duration);
 });
 
-// ===== Progress drag/click =====
-progress.addEventListener("mousedown", () => isSeeking = true);
-progress.addEventListener("mouseup", () => {
+// ===== Progress drag/click (desktop + mobile) =====
+function startSeek() { isSeeking = true; }
+
+function endSeek(e) {
   isSeeking = false;
-  if (audio.duration) audio.currentTime = (progress.value / 100) * audio.duration;
-});
-progress.addEventListener("input", () => {
-  if (audio.duration && isSeeking) currentTimeEl.textContent = formatTime((progress.value / 100) * audio.duration);
-});
-progress.addEventListener("click", (e) => {
-  if (audio.duration) {
-    const rect = progress.getBoundingClientRect();
-    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
-  }
-});
+  if (!audio.duration) return;
+
+  const rect = progress.getBoundingClientRect();
+  let clientX;
+  if (e.type.startsWith("touch")) clientX = e.changedTouches[0].clientX;
+  else clientX = e.clientX;
+
+  const value = ((clientX - rect.left) / rect.width) * 100;
+  audio.currentTime = (value / 100) * audio.duration;
+  progress.value = value;
+}
+
+function seeking(e) {
+  if (!isSeeking || !audio.duration) return;
+
+  const rect = progress.getBoundingClientRect();
+  let clientX;
+  if (e.type.startsWith("touch")) clientX = e.touches[0].clientX;
+  else clientX = e.clientX;
+
+  const value = ((clientX - rect.left) / rect.width) * 100;
+  currentTimeEl.textContent = formatTime((value / 100) * audio.duration);
+  progress.value = value;
+}
+
+// Mouse events
+progress.addEventListener("mousedown", startSeek);
+progress.addEventListener("mousemove", seeking);
+progress.addEventListener("mouseup", endSeek);
+progress.addEventListener("click", endSeek);
+
+// Touch events
+progress.addEventListener("touchstart", startSeek);
+progress.addEventListener("touchmove", seeking);
+progress.addEventListener("touchend", endSeek);
 
 // ===== Button controls =====
 playPauseBtn.addEventListener("click", togglePlayPause);
